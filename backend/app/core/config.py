@@ -1,0 +1,5 @@
+DB_HOST = "ep-shiny-violet-aegc8zh0-pooler.c-2.us-east-2.aws.neon.tech"
+DB_NAME = "neondb"
+DB_USER = "neondb_owner"
+DB_PASS = "npg_IPFJf9W4meKV"
+DB_SSL = "require"
