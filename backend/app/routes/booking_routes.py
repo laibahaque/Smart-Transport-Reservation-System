@@ -18,6 +18,10 @@ def get_my_bookings(request: Request, user_id: int = Depends(get_current_user)):
     return fetch_user_bookings_controller(user_id)
 # ✅ Cancel booking
 @router.put("/{booking_id}/cancel")
-def cancel_booking(request: Request, booking_id: int, user_id: int = Depends(get_current_user)):
+def cancel_booking(
+    booking_id: int,
+    user_id: int = Depends(get_current_user)
+):
     from app.controllers.booking_controller import cancel_booking_controller
     return cancel_booking_controller(user_id, booking_id)
+

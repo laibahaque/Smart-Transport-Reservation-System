@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from app.models.booking_model import insert_booking, get_user_bookings,cancel_user_booking
 
 def create_booking_controller(user_id: int, booking_data):
-    result = insert_booking(user_id, booking_data.availability_id, booking_data.cnic, booking_data.passport)
+    result = insert_booking(user_id, booking_data.availability_id, booking_data.cnic, booking_data.passport, booking_data.seat_count)
 
     if result["status"] == "error":
         raise HTTPException(status_code=400, detail=result["message"])

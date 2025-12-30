@@ -30,11 +30,12 @@ export default function SplashScreen() {
 
   return (
     <LinearGradient
-      colors={["#D8CCC1", "#FAF9F6"]}
+      colors={["#fffeffff", "#998499ff"]}
       start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
+      end={{ x: 1, y: 1 }}
       style={styles.container}
     >
+
       <Animated.Image
         source={require("../assets/images/logo.png")}
         style={[

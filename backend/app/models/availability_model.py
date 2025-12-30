@@ -69,3 +69,38 @@ def get_all_availabilities(from_city=None, to_city=None, transport_type=None, da
             cur.close()
         if conn:
             conn.close()
+
+def get_vehicles_by_route(route_id, date=None):
+    conn = None
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+
+        query = """
+            SELECT DISTINCT
+                v.id,
+                v.type
+            FROM availability a
+            JOIN vehicle v ON a.vehicle_id = v.id
+            WHERE a.route_id = %s
+        """
+        params = [route_id]
+
+        if date:
+            query += " AND a.available_date = %s"
+            params.append(date)
+
+        cur.execute(query, tuple(params))
+        rows = cur.fetchall()
+
+        return [{"id": r[0], "type": r[1]} for r in rows]
+
+    except Exception as e:
+        print("❌ Error fetching vehicles by route:", e)
+        return []
+
+    finally:
+        if conn:
+            cur.close()
+            conn.close()
+

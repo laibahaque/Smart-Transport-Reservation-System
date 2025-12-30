@@ -4,123 +4,120 @@ import {
   Text,
   TouchableOpacity,
   Animated,
-  Easing,
-  Dimensions,
+  FlatList,
+  Image,
+  ScrollView
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { homeStyles as styles } from "../../styles/home.style";
 import { COLORS } from "../../constants/colors";
 import { useRouter } from "expo-router";
-import Header from "../../components/Header";   // ✅ Header component import kiya
+import Header from "../../components/Header";
+import BottomNav from "../../components/Bottom";
 
-const { width } = Dimensions.get("window");
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const images = [
+
+
+const heroImages = [
   require("../../assets/images/bus.jpg"),
   require("../../assets/images/airplane.jpg"),
   require("../../assets/images/train.jpg"),
   require("../../assets/images/car.jpg"),
 ];
 
-const feedbacks = [
-  { text: "Super easy to use and very reliable! Booking is smooth and fast.", user: "Sarah K." },
-  { text: "The app design is amazing, I can book my ride in seconds!", user: "Ali R." },
-  { text: "Great for both local and international transport booking.", user: "Emma W." },
-  { text: "Simple, clean, and efficient — highly recommended!", user: "Zeeshan A." },
-  { text: "Perfect app for frequent travelers. Everything in one place.", user: "Hina M." },
+const categories = [
+  { id: 1, name: "Bus", icon: "bus" },
+  { id: 2, name: "Flight", icon: "airplane" },
+  { id: 3, name: "Train", icon: "train" },
+  { id: 4, name: "Car Rental", icon: "car" },
 ];
 
 export default function Home() {
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const [currentImage, setCurrentImage] = useState(0);
-  const [currentFeedback, setCurrentFeedback] = useState(0);
   const router = useRouter();
+  const handleBookNow = async () => {
+    const token = await AsyncStorage.getItem("token");
 
-  // 🔄 Smooth image fade animation
+    if (token) {
+      router.push("/(tabs)/profile");
+    } else {
+      router.replace("/auth/login");
+    }
+  };
+
   useEffect(() => {
     const interval = setInterval(() => {
       Animated.sequence([
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 600,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: true,
-        }),
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 600,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: true,
-        }),
+        Animated.timing(fadeAnim, { toValue: 0, duration: 500, useNativeDriver: true }),
+        Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true })
       ]).start(() => {
-        setCurrentImage((prev) => (prev + 1) % images.length);
+        setCurrentImage((prev) => (prev + 1) % heroImages.length);
       });
-    }, 5000);
+    }, 4000);
+
     return () => clearInterval(interval);
   }, []);
 
-  const handleNext = () => setCurrentFeedback((prev) => (prev + 1) % feedbacks.length);
-  const handlePrev = () =>
-    setCurrentFeedback((prev) => (prev === 0 ? feedbacks.length - 1 : prev - 1));
-
   return (
     <View style={styles.container}>
-      {/* ✅ Reusable Header Component */}
-      <Header title="Smart Transport" />
+      <Header title="RaastaGo" />
 
-      {/* WELCOME */}
-      <View style={styles.welcomeContainer}>
-        <Text style={styles.welcomeText}>Welcome Back</Text>
-        <Text style={styles.subTitle}>Smart Transport Reservations</Text>
-      </View>
+      <ScrollView showsVerticalScrollIndicator={false}>
 
-      {/* HERO */}
-      <View style={styles.heroSection}>
-        <Animated.Image
-          source={images[currentImage]}
-          style={[styles.image, { opacity: fadeAnim }]}
-          resizeMode="cover"
-        />
-        <View style={styles.overlay}>
-          <Text style={styles.heroTitle}>All Your Journeys, Just One Tap Away.</Text>
-        </View>
-      </View>
-
-      {/* CARD */}
-      <View style={styles.card}>
-        <Text style={styles.description}>
-          Book your ticket in just seconds.{"\n"}Your ultimate travel companion is here.
-        </Text>
-      </View>
-
-      {/* FEEDBACK */}
-      <View style={styles.feedbackSection}>
-        <Text style={styles.feedbackMainTitle}>What Our Users Say!</Text>
-        <View style={styles.feedbackBox}>
-          <TouchableOpacity onPress={handlePrev} style={styles.arrowButton}>
-            <Ionicons name="chevron-back" size={22} color={COLORS.primary} />
-          </TouchableOpacity>
-          <View style={styles.feedbackContent}>
-            <Text style={styles.feedbackText}>
-              “{feedbacks[currentFeedback].text}”
-            </Text>
-            <Text style={styles.feedbackUser}>
-              — {feedbacks[currentFeedback].user}
-            </Text>
+        {/* HERO SECTION */}
+        <View style={styles.heroSection}>
+          <Animated.Image
+            source={heroImages[currentImage]}
+            style={[styles.heroImage, { opacity: fadeAnim }]}
+            resizeMode="cover"
+          />
+          <View style={styles.heroOverlay}>
+            <Text style={styles.heroTitle}>Find Your Perfect Ride</Text>
           </View>
-          <TouchableOpacity onPress={handleNext} style={styles.arrowButton}>
-            <Ionicons name="chevron-forward" size={22} color={COLORS.primary} />
-          </TouchableOpacity>
         </View>
-      </View>
 
-      {/* BUTTON */}
-      <TouchableOpacity
-        style={styles.bookButton}
-        onPress={() => router.push("/auth/login")} // ✅ Login page
-      >
-        <Text style={styles.bookText}>Book Yours</Text>
-      </TouchableOpacity>
+        {/* CATEGORIES */}
+        <Text style={styles.sectionTitle}>Travel Modes</Text>
+        <View style={styles.categoryContainer}>
+          {categories.map((item) => (
+            <TouchableOpacity key={item.id} style={styles.categoryBox}>
+              <Ionicons name={item.icon} size={25} color={COLORS.primary} />
+              <Text style={styles.categoryText}>{item.name}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* POPULAR ROUTES */}
+        <Text style={styles.sectionTitle}>Popular Routes</Text>
+
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {["Karachi → Lahore", "Islamabad → Multan", "Quetta → Karachi"].map(
+            (route, index) => (
+              <View key={index} style={styles.routeCard}>
+                <Text style={styles.routeText}>{route}</Text>
+              </View>
+            )
+          )}
+        </ScrollView>
+
+        {/* ACTION BUTTON */}
+        <TouchableOpacity
+          style={styles.bookButton}
+          onPress={handleBookNow}
+        >
+          <Text style={styles.bookText}>Book Now</Text>
+        </TouchableOpacity>
+
+
+
+        <View style={{ height: 80 }} />
+      </ScrollView>
+
+      {/* BOTTOM NAVIGATION */}
+      <BottomNav active="home" />
+
     </View>
   );
 }

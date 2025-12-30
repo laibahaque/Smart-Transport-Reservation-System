@@ -1,146 +1,113 @@
-// styles/auth.styles.js
 import { StyleSheet } from "react-native";
 import { COLORS } from "../constants/colors";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
-    paddingHorizontal: 20, // sirf left aur right ke liye
-    paddingTop: 15,
-    
+    paddingHorizontal: 12,
+    justifyContent: "flex-start",   // top alignment
+    alignItems: "center",
+
   },
 
-  // 🔙 Back Button
-  backButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    alignSelf: "flex-start",
-    // marginBottom: 35,
-    
+  centerLogo: {
+    width: "60%",     // perfect size
+    height: undefined,
+    aspectRatio: 1,
+    alignSelf: "center",
+    // marginTop: 20,    // thoda sa upar
+    // marginBottom: 15,
+    resizeMode: "contain",
   },
-  backText: {
-    marginLeft: 6,
-    fontSize: 16,
-    color: COLORS.text,
-  },
-  infoText: {
-    marginTop: 120,
-    marginBottom: 10,
-    textAlign: "center",
-    color: COLORS.text || "#c76734ff",
-    fontSize: 15,
-    textDecorationLine: "underline",
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: COLORS.text,
-    marginVertical: 15,
+
+
+  authTitle: {
+    fontSize: 28,
+    fontWeight: "700",
+    color: COLORS.primaryDark,
+    marginBottom: 6,
     textAlign: "center",
   },
+
+  authSubtitle: {
+    fontSize: 14,
+    color: COLORS.textLight,
+    marginBottom: 20,
+    textAlign: "center",
+  },
+
+  formCard: {
+    width: "100%",
+    backgroundColor: COLORS.white,
+    padding: 18,
+    borderRadius: 18,
+    elevation: 4,
+    // marginTop: 10,
+  },
+
   input: {
     backgroundColor: COLORS.white,
-    borderRadius: 12,
-    padding: 15,
-    marginBottom: 16,
     borderWidth: 1,
     borderColor: COLORS.border,
+    borderRadius: 14,
+    padding: 13,
     fontSize: 16,
+    marginBottom: 10,
     color: COLORS.text,
   },
-  errorInput: {
-    borderColor: COLORS.expense,
+
+  inputFocused: {
+    borderColor: COLORS.primary,
   },
+
+  eyeButton: {
+    position: "absolute",
+    right: 12,
+    top: 14,
+  },
+
   button: {
-    backgroundColor: COLORS.primary,
-    borderRadius: 12,
-    padding: 16,
+    paddingVertical: 12,
+    borderRadius: 16,
     alignItems: "center",
-    marginTop: 10,
-    marginBottom: 20,
   },
+
   buttonText: {
     color: COLORS.white,
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: "600",
-  },
-  footerContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 8,
-  },
-  footerText: {
-    color: COLORS.text,
-    fontSize: 16,
-  },
-  linkText: {
-    color: COLORS.primary,
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  verificationContainer: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-    padding: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  verificationTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: COLORS.text,
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  verificationInput: {
-    backgroundColor: COLORS.white,
-    borderRadius: 12,
-    padding: 15,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    fontSize: 16,
-    color: COLORS.text,
-    width: "100%",
-    textAlign: "center",
-    letterSpacing: 2,
   },
 
-  // 🔴 Error styles
   errorBox: {
-    backgroundColor: "#FFE5E5",
-    padding: 12,
-    borderRadius: 8,
-    borderLeftWidth: 4,
-    borderLeftColor: COLORS.expense,
-    marginBottom: 16,
     flexDirection: "row",
     alignItems: "center",
-    width: "100%",
+    padding: 10,
+    borderRadius: 12,
+    backgroundColor: "#ffecec",
+    marginBottom: 12,
+    gap: 6,
   },
+
   errorText: {
-    color: COLORS.text,
-    marginLeft: 8,
-    flex: 1,
-    fontSize: 14,
+    color: COLORS.primary,
+    fontSize: 13,
   },
-  signupContainer: {
+
+  footerRow: {
     flexDirection: "row",
     justifyContent: "center",
-    alignItems: "center",
+    marginTop: 18,
   },
 
-  signupText: {
-    color: COLORS.text,
+  footerText: {
+    color: COLORS.textLight,
     fontSize: 14,
   },
 
-  signupLink: {
+  footerLink: {
+    marginLeft: 6,
     color: COLORS.primary,
     fontWeight: "600",
     fontSize: 14,
   },
-
 });

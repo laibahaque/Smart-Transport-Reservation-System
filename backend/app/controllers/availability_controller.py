@@ -1,4 +1,4 @@
-from app.models.availability_model import get_all_availabilities
+from app.models.availability_model import get_all_availabilities,get_vehicles_by_route
 def fetch_availability(from_city=None, to_city=None, transport_type=None, date=None):
     """
     Controller to get filtered availability.
@@ -7,3 +7,6 @@ def fetch_availability(from_city=None, to_city=None, transport_type=None, date=N
     
     # ✅ Must return list directly, not wrapped in dict
     return data
+
+def fetch_vehicles_by_route(route_id, date=None):
+    return get_vehicles_by_route(route_id, date)

@@ -1,5 +1,14 @@
-import { useState } from "react";
-import { Text, TextInput, TouchableOpacity, View, ActivityIndicator } from "react-native";
+import React, { useRef, useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ActivityIndicator,
+  Animated,
+  Image,
+  Pressable,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -7,16 +16,32 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { styles } from "../../styles/auth.styles";
 import { COLORS } from "../../constants/colors";
 import Header from "../../components/Header";
+import { LinearGradient } from "expo-linear-gradient";
+
+// ⭐ BOTTOM NAV IMPORT HERE
+import BottomNav from "../../components/Bottom";
 
 export default function LoginPage() {
   const router = useRouter();
+  const fade = useRef(new Animated.Value(0)).current;
 
-  const [emailAddress, setEmailAddress] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [visible, setVisible] = useState(false);
+  const [focused, setFocused] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    Animated.timing(fade, {
+      toValue: 1,
+      duration: 400,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
   const handleLogin = async () => {
-    if (!emailAddress || !password) {
+    if (!email || !password) {
       setError("Both fields are required!");
       return;
     }
@@ -28,96 +53,125 @@ export default function LoginPage() {
       const response = await fetch("http://172.16.5.234:8000/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: emailAddress,
-          password,
-        }),
+        body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json(); // ✅ First parse response
+      const data = await response.json();
       setLoading(false);
-
-      console.log("📩 Server Response:", data); // 👈 Debug output
 
       if (response.ok) {
-        // ✅ Your backend returns "session_token"
         if (data.session_token) {
           await AsyncStorage.setItem("token", data.session_token);
-          console.log("✅ Token saved:", data.session_token);
-        } else {
-          console.log("⚠️ No token found in response!");
         }
-
-        router.replace("/profile"); // ✅ Redirect on success
+        router.replace("/(tabs)/profile");
       } else {
         setError(data.detail || "Invalid email or password.");
-        console.log("❌ Login failed:", data);
       }
-    } catch (err) {
+    } catch {
       setLoading(false);
-      console.log("🚨 Network or other error:", err);
-      setError("Network error. Please check your connection.");
+      setError("Network error. Please try again.");
     }
   };
 
-
   return (
-    <KeyboardAwareScrollView
-      style={{ flex: 1 }}
-      contentContainerStyle={{ flexGrow: 1 }}
-      enableOnAndroid
-      enableAutomaticScroll
-      extraScrollHeight={30}
-    >
-      <Header title="Smart Transport" />
-      <View style={styles.container}>
+    <View style={{ flex: 1 }}>
+      <KeyboardAwareScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ flexGrow: 1 }}
+      >
+        <Animated.View style={{ flex: 1, opacity: fade }}>
+          
+          <Header title="Login" />
 
+          <View style={styles.container}>
 
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={22} color={COLORS.text} />
-          <Text style={styles.backText}>Back</Text>
-        </TouchableOpacity>
+            <Image
+              source={require("../../assets/images/logo.png")}
+              style={styles.centerLogo}
+            />
 
-        <Text style={styles.infoText}>For any type of booking you need to login first!</Text>
+            <Text style={styles.authTitle}>Welcome Back</Text>
+            <Text style={styles.authSubtitle}>Login to continue</Text>
 
-        <Text style={styles.title}>Login</Text>
+            <View style={styles.formCard}>
+              {error ? (
+                <View style={styles.errorBox}>
+                  <Ionicons name="alert-circle" size={20} color={COLORS.primary} />
+                  <Text style={styles.errorText}>{error}</Text>
+                </View>
+              ) : null}
 
-        <TextInput
-          style={styles.input}
-          placeholder="Enter email"
-          placeholderTextColor="#9A8478"
-          autoCapitalize="none"
-          value={emailAddress}
-          onChangeText={setEmailAddress}
-        />
+              <TextInput
+                style={[styles.input, focused === "email" && styles.inputFocused]}
+                placeholder="Email"
+                value={email}
+                onChangeText={setEmail}
+                placeholderTextColor={COLORS.textLight}
+                onFocus={() => setFocused("email")}
+                onBlur={() => setFocused(null)}
+                autoCapitalize="none"
+                keyboardType="email-address"
+              />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Enter password"
-          placeholderTextColor="#9A8478"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
+              <View>
+                <TextInput
+                  style={[
+                    styles.input,
+                    focused === "password" && styles.inputFocused,
+                    { paddingRight: 40 },
+                  ]}
+                  placeholder="Password"
+                  value={password}
+                  onChangeText={setPassword}
+                  placeholderTextColor={COLORS.textLight}
+                  secureTextEntry={!visible}
+                  onFocus={() => setFocused("password")}
+                  onBlur={() => setFocused(null)}
+                />
+                <Pressable
+                  onPress={() => setVisible(!visible)}
+                  style={styles.eyeButton}
+                >
+                  <Ionicons
+                    name={visible ? "eye" : "eye-off"}
+                    size={20}
+                    color={COLORS.textLight}
+                  />
+                </Pressable>
+              </View>
 
-        {error ? <Text style={{ color: "red", marginBottom: 10 }}>{error}</Text> : null}
+              <TouchableOpacity
+                onPress={handleLogin}
+                disabled={loading}
+                style={{ marginTop: 22 }}
+              >
+                <LinearGradient
+                  colors={[COLORS.primaryDark, COLORS.primary]}
+                  style={styles.button}
+                >
+                  {loading ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <Text style={styles.buttonText}>Login</Text>
+                  )}
+                </LinearGradient>
+              </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>Sign In</Text>
-          )}
-        </TouchableOpacity>
+              <View style={styles.footerRow}>
+                <Text style={styles.footerText}>Don’t have an account?</Text>
+                <TouchableOpacity onPress={() => router.push("/auth/signup")}>
+                  <Text style={styles.footerLink}>Sign Up</Text>
+                </TouchableOpacity>
+              </View>
 
-        {/* 👇 Added Section: Don't have an account */}
-        <View style={styles.signupContainer}>
-          <Text style={styles.signupText}>Don’t have an account?</Text>
-          <TouchableOpacity onPress={() => router.push("/auth/signup")}>
-            <Text style={styles.signupLink}> Sign up</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </KeyboardAwareScrollView>
+            </View>
+          </View>
+        </Animated.View>
+      </KeyboardAwareScrollView>
+
+      {/* ⭐ FIXED BOTTOM NAV */}
+      <BottomNav active="profile" />
+
+    </View>
   );
 }
